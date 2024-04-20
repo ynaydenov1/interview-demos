@@ -1,9 +1,10 @@
 package com.quickbase;
 
-import com.quickbase.devint.DBManager;
-import com.quickbase.devint.DBManagerImpl;
+import com.quickbase.devint.*;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.sql.Connection;
+import java.util.List;
 
 /**
  * The main method of the executable JAR generated from this repository. This is to let you
@@ -22,5 +23,30 @@ public class Main {
             System.exit(1);
         }
 
+        // Print database tables and their column names
+        dbm.printDatabaseMetadata();
+
+        // Retrieve the total population data by country from the database
+        List<Pair<String, Integer>> populationFromDatabase = dbm.getTotalPopulationByCountry();
+        System.out.println("Data from the database:");
+        System.out.println(populationFromDatabase);
+
+        // Get population data by country from the API
+        IStatService concreteStatService = new ConcreteStatService();
+        List<Pair<String, Integer>> populationFromAPI = concreteStatService.GetCountryPopulations();
+        System.out.println("Data from the API:");
+        System.out.println(populationFromAPI);
+
+        // Merge population data using a loop-based approach
+        List<Pair<String, Integer>> mergedPopulationUsingLists = ListCombinator.mergePopulationUsingLoops(populationFromDatabase,
+                populationFromAPI);
+        System.out.println("Merged data using first method:");
+        System.out.println(mergedPopulationUsingLists);
+
+        // Merge population data using a hashmap-based approach
+        List<Pair<String, Integer>> mergedPopulationUsingMaps = ListCombinator.mergePopulationUsingMaps(populationFromDatabase,
+                populationFromAPI);
+        System.out.println("Merged data using second method:");
+        System.out.println(mergedPopulationUsingMaps);
     }
 }
